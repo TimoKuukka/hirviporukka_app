@@ -14,7 +14,7 @@ import prepareData
 # CLASS DEFINITIONS FOR THE APP
 # -----------------------------
 
-class MultipageMainWindow(QMainWindow):
+class MultiPageMainWindow(QMainWindow):
     
     # Constructor, a method for creating objects from this class
     def __init__(self):
@@ -23,14 +23,12 @@ class MultipageMainWindow(QMainWindow):
         # Create an UI from the ui file
         loadUi('MultiPageMainWindow.ui', self)
 
-        # Define properties for ui elements
-        self.refreshBtn = self.refreshPushButton
-        self.groupInfo = self.groupSummaryTableWidget
-        self.sharedMeatInfo = self.meatSharedTableWidget
+        # UI ELEMENTS TO PROPERTIES
+        # -----------
 
         # SUMMARY page (Yhteenveto)
-        self.summaryRefresBtn = self.summaryRefresButton
-        self.summaryRefresBtn.clicked.connect(self.populateSummaryPage) # Signal
+        self.summaryRefreshBtn = self.summaryRefreshPushButton
+        self.summaryRefreshBtn.clicked.connect(self.populateSummaryPage) # Signal
         self.summaryMeatSharedTW = self.meatSharedTableWidget
         self.summaryGroupSummaryTW = self.groupSummaryTableWidget
 
@@ -43,12 +41,12 @@ class MultipageMainWindow(QMainWindow):
         self.genderCB = self.genderComboBox
         self.weightLE = self.weightLineEdit
         self.usageCB = self.usageComboBox
-        self.AddInfoTE = self.AdditionalInfoTextEdit
+        self.addInfoTE = self.additionalInfoTextEdit
         self.saveShotPushBtn = self.saveShotPushButton
-        self.killsKillTW = self.killsKillTableWidget
+        self.killsKillsTW = self.killsKillsTableWidget
 
         # Share page (Lihanjako)
-        self.shareKillsTW = self.shareKillsTableWidget
+        self.sharedKillsTW = self.sharedKillsTableWidget
         self.shareDE = self.shareDateEdit
         self.portionCB = self.portionComboBox
         self.amountLE = self.amountLineEdit
@@ -62,48 +60,34 @@ class MultipageMainWindow(QMainWindow):
         self.licenseGenderCB = self.licenseGenderComboBox
         self.licenseAmountLE = self.licenseAmountLineEdit
         self.licenseSavePushBtn = self.licenseSavePushButton
-        self.grantedLicenseTW = self.grantedLicenseTableWidget
+        self.summaryLicenseTW = self.licenseSummaryTableWidget
 
-        '''
-        # Database connection parameters
-        self.database = "metsastys"
-        self.user = "sovellus"
-        self.userPassword = "Q2werty"
-        self.server = "localhost"
-        self.port = "5432"
-        '''
+        # Signal when a page is opened
+        self.pageTab = self.tabWidget
 
-        # SIGNALS
+        # Signals other than emitted by UI elements
 
-        # Emit a signal when refresh push button is pressed
-        self.refreshBtn.clicked.connect(self.agentRefreshData)
 
     # SLOTS
 
+    # A method to populate summaryPage's table table widgets
+
     # Agent method is used for receiving a signal from an UI element
-    def agentRefreshData(self):
+    def populateSummaryPage(self):
 
         # Read data from view jaetut_lihat
         databaseOperation1 = pgModule.DatabaseOperation()
         connectionArguments = databaseOperation1.readDatabaseSettingsFromFile('settings.dat')
         databaseOperation1.getAllRowsFromTable(connectionArguments, 'public.jaetut_lihat')
-        print(databaseOperation1.detailedMessage)
+        # TODO: MessageBox if an error occured
+        prepareData.prepareTable(databaseOperation1, self.summaryMeatSharedTW)
         
         # Read data from view jakoryhma_yhteenveto, no need to read connection args twice
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(connectionArguments, 'public.jakoryhma_yhteenveto')
-        print(databaseOperation2.detailedMessage)
-        
-        # Let's call the real method which updates the widget
-        self.refreshData(databaseOperation1, self.sharedMeatInfo)
-        self.refreshData(databaseOperation2, self.groupInfo)
-
-    # This is a function that updates table widgets in the UI
-    # because it does not receive signals; it's not a slot
-    def refreshData(self, databaseOperation, widget):
-        prepareData.prepareTable(databaseOperation, widget)
-        
-        
+        # TODO: MessageBox if an error occured
+        prepareData.prepareTable(databaseOperation1, self.summaryGroupSummaryTW)
+     
 
 # APPLICATION CREATION AND STARTING
 # ----------------------------------

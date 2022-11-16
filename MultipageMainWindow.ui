@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="summaryPage">
      <attribute name="title">
@@ -76,7 +76,7 @@
        <string>Ryhmän tiedot</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="summarRefreshPushButton">
+     <widget class="QPushButton" name="summaryRefreshPushButton">
       <property name="geometry">
        <rect>
         <x>260</x>
@@ -313,7 +313,7 @@
        <string>Lisätietoja</string>
       </property>
      </widget>
-     <widget class="QTableWidget" name="killsKillsWidget">
+     <widget class="QTableWidget" name="killsKillsTableWidget">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -767,7 +767,7 @@
  </widget>
  <tabstops>
   <tabstop>tabWidget</tabstop>
-  <tabstop>summarRefreshPushButton</tabstop>
+  <tabstop>summaryRefreshPushButton</tabstop>
   <tabstop>meatSharedTableWidget</tabstop>
   <tabstop>groupSummaryTableWidget</tabstop>
   <tabstop>shotByComboBox</tabstop>
@@ -780,7 +780,7 @@
   <tabstop>usageComboBox</tabstop>
   <tabstop>additionalInfoTextEdit</tabstop>
   <tabstop>saveShotPushButton</tabstop>
-  <tabstop>killsKillsWidget</tabstop>
+  <tabstop>killsKillsTableWidget</tabstop>
   <tabstop>sharedKillsTableWidget</tabstop>
   <tabstop>shareDateEdit</tabstop>
   <tabstop>portionComboBox</tabstop>
