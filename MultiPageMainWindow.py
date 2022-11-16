@@ -64,9 +64,10 @@ class MultiPageMainWindow(QMainWindow):
 
         # Signal when a page is opened
         self.pageTab = self.tabWidget
+        self.pageTab.currentChanged.connect(self.populateAllPages)
 
         # Signals other than emitted by UI elements
-
+        self.populateAllPages()
 
     # SLOTS
 
@@ -86,8 +87,23 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(connectionArguments, 'public.jakoryhma_yhteenveto')
         # TODO: MessageBox if an error occured
-        prepareData.prepareTable(databaseOperation1, self.summaryGroupSummaryTW)
+        prepareData.prepareTable(databaseOperation2, self.summaryGroupSummaryTW)
      
+    def populateKillPage(self):
+         # Read data from view kaatoluettelo
+        databaseOperation1 = pgModule.DatabaseOperation()
+        connectionArguments = databaseOperation1.readDatabaseSettingsFromFile('settings.dat')
+        databaseOperation1.getAllRowsFromTable(connectionArguments, 'public.kaatoluettelo')
+        # TODO: MessageBox if an error occured
+        prepareData.prepareTable(databaseOperation1, self.killsKillsTW)
+
+        # Read data from view nimivalinta
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(connectionArguments, 'public.nimivalinta')
+
+    def populateAllPages(self):
+        self.populateSummaryPage()
+        self.populateKillPage
 
 # APPLICATION CREATION AND STARTING
 # ----------------------------------
