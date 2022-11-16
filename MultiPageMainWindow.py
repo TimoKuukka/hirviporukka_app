@@ -14,19 +14,55 @@ import prepareData
 # CLASS DEFINITIONS FOR THE APP
 # -----------------------------
 
-class GroupMainWindow(QMainWindow):
+class MultipageMainWindow(QMainWindow):
     
     # Constructor, a method for creating objects from this class
     def __init__(self):
         QMainWindow.__init__(self)
 
         # Create an UI from the ui file
-        loadUi('groupInfoMainWindow.ui', self)
+        loadUi('MultiPageMainWindow.ui', self)
 
         # Define properties for ui elements
         self.refreshBtn = self.refreshPushButton
         self.groupInfo = self.groupSummaryTableWidget
         self.sharedMeatInfo = self.meatSharedTableWidget
+
+        # SUMMARY page (Yhteenveto)
+        self.summaryRefresBtn = self.summaryRefresButton
+        self.summaryRefresBtn.clicked.connect(self.populateSummaryPage) # Signal
+        self.summaryMeatSharedTW = self.meatSharedTableWidget
+        self.summaryGroupSummaryTW = self.groupSummaryTableWidget
+
+        # Kill page (Kaato)
+        self.shotCB = self.shotByComboBox
+        self.shotDate = self.shotDateEdit
+        self.shotLocation = self.locationLineEdit
+        self.shotAnimalCB = self.animalComboBox
+        self.ageGroupCB = self.ageGroupComboBox
+        self.genderCB = self.genderComboBox
+        self.weightLE = self.weightLineEdit
+        self.usageCB = self.usageComboBox
+        self.AddInfoTE = self.AdditionalInfoTextEdit
+        self.saveShotPushBtn = self.saveShotPushButton
+        self.killsKillTW = self.killsKillTableWidget
+
+        # Share page (Lihanjako)
+        self.shareKillsTW = self.shareKillsTableWidget
+        self.shareDE = self.shareDateEdit
+        self.portionCB = self.portionComboBox
+        self.amountLE = self.amountLineEdit
+        self.groupCB = self.groupComboBox
+        self.shareSavePushBtn = self.shareSavePushButton
+
+        # License page (Luvat)
+        self.licenseYearLE = self.licenseYearLineEdit
+        self.licenseAnimalCB = self.licenseAnimalComboBox
+        self.licenseAgeGroupCB = self.licenseAgeGroupComboBox
+        self.licenseGenderCB = self.licenseGenderComboBox
+        self.licenseAmountLE = self.licenseAmountLineEdit
+        self.licenseSavePushBtn = self.licenseSavePushButton
+        self.grantedLicenseTW = self.grantedLicenseTableWidget
 
         '''
         # Database connection parameters
@@ -36,6 +72,7 @@ class GroupMainWindow(QMainWindow):
         self.server = "localhost"
         self.port = "5432"
         '''
+
         # SIGNALS
 
         # Emit a signal when refresh push button is pressed
@@ -79,7 +116,7 @@ if __name__ == "__main__":
     app.setStyle('Fusion')
 
     # Create the Main Window object from FormWithTable Class and show it on the screen
-    appWindow = GroupMainWindow()
+    appWindow = MultiPageMainWindow()
     appWindow.show()  # This can also be included in the FormWithTable class
     sys.exit(app.exec_())
         
