@@ -79,11 +79,11 @@ class DatabaseOperation():
 
     # Method to get all rows from a given table
     def getAllRowsFromTable(self, connectionArgs, table):
-        """Selects all rows from the table
+        """Selects all rows from the table, view or SQL function's result set
 
         Args:
             connectionArgs (dict): Connection arguments in key-value pairs
-            table (str): Name of the table to read from
+            table (str): Name of the table, view or function to read from
         """
         server = connectionArgs['server']
         port = connectionArgs['port']
@@ -115,7 +115,7 @@ class DatabaseOperation():
                 self.errorMessage = 'Luettiin taulu onnistuneesti'
                 self.detailedMessage = 'Read all data from the table'
 
-        except (Exception, psycopg2.Error )as error:
+        except (Exception, psycopg2.Error)as error:
 
             # Set error values
             self.errorCode = 1
@@ -160,8 +160,8 @@ class DatabaseOperation():
                 self.errorMessage = 'Lisättiin tietue onnistuneesti'
                 self.detailedMessage = 'Inserting into table was successful'
                 dbconnection.commit()
-                
-        except (Exception, psycopg2.Error )as error:
+
+        except (Exception, psycopg2.Error)as error:
 
             # Set error values
             self.errorCode = 1
@@ -184,17 +184,64 @@ class DatabaseOperation():
         """
         pass
 
+
     # Method to delete a row from table
     def deleteFromTable(self, connectionArgs, table, limit):
         """Delete rows from a table using limiting SQL statement
 
         Args:
-            connectionArgs (dict): Connection arguments in key-value-pairs
+            connectionArgs (dict): Connection arguments in key-value pairs
             table (str): Table name
             limit WHERE SQL statement
         """
         pass
 
+    # Method to call a stored procedure and pass parameters
+    def callProcedure(self, connectionArgs, procedure, params):
+        """Calls a procedure and pass parameters
+
+        Args:
+            connectionArgs (dict): Connection arguments in key-value pairs
+            procedure (str): Name of the procedure to call
+            params (list): Procedure's input parameters
+        """
+        pass
+
+        server = connectionArgs['server']
+        port = connectionArgs['port']
+        database = connectionArgs['database']
+        user = connectionArgs['user']
+        password = connectionArgs['password']
+
+        try:
+            # Connect to the database and set error parameters
+            dbconnection = psycopg2.connect(
+                database=database, user=user, password=password, host=server, port=port)
+            self.errorCode = 0
+            self.errorMessage = 'Yhdistettiin tietokantaan'
+            self.detailedMessage = 'Connected to database successfully'
+
+            # Create a cursor to retrieve data from the table
+            with dbconnection.cursor() as cursor:
+                procedureCall = f'CALL {procedure} {params}'
+                cursor.execute(procedureCall)
+
+                # Set error values
+                self.errorCode = 0
+                self.errorMessage = 'Suoritettiin proseduuri onnistuneesti'
+                self.detailedMessage = 'Procedure call was successful'
+                dbconnection.commit()
+
+        except (Exception, psycopg2.Error)as error:
+
+            # Set error values
+            self.errorCode = 1
+            self.errorMessage = 'Tietokannan käsittely ei onnistunut'
+            self.detailedMessage = str(error)
+
+        finally:
+            if self.errorCode == 0:
+                dbconnection.close()
 
 # LOCAL TESTS, REMOVE WHEN FINISHED DESIGNING THE MODULE
 if __name__ == "__main__":
