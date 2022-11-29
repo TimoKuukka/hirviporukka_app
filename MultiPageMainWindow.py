@@ -11,12 +11,15 @@ from PyQt5.QtCore import *  # FIXME: Everything,  change to individual component
 from datetime import date
 import pgModule
 import prepareData
+import DialogMakersWindow
+import dialogs
 
 # CLASS DEFINITIONS FOR THE APP
 # -----------------------------
 
 
 class MultiPageMainWindow(QMainWindow):
+
 
     # Constructor, a method for creating objects from this class
     def __init__(self):
@@ -32,7 +35,7 @@ class MultiPageMainWindow(QMainWindow):
 
         # UI ELEMENTS TO PROPERTIES
         # -------------------------
-        
+
         # Create a status bar to show informative messages (replaces print function used in previous exercises)
         self.statusBar = QStatusBar()  # Create a status bar object
         # Set it as the status bar for the main window
@@ -41,8 +44,6 @@ class MultiPageMainWindow(QMainWindow):
 
         # Set current date when the app starts
         self.currentDate = date.today()
-
-
 
         # Summary page (Yhteenveto)
         self.summaryRefreshBtn = self.summaryRefreshPushButton
@@ -88,6 +89,8 @@ class MultiPageMainWindow(QMainWindow):
 
         # Signals other than emitted by UI elements
         self.populateAllPages()
+
+       
 
     # SLOTS
 
@@ -191,15 +194,15 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation4 = pgModule.DatabaseOperation()
         databaseOperation4.getAllRowsFromTable(
             self.connectionArguments, 'public.aikuinenvasa')
-        
+
         # Check if error has occurred
         if databaseOperation4.errorCode != 0:
             self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
                        databaseOperation4.errorMessage, databaseOperation4.detailedMessage)
         else:
             self.shotAgeGroupText = prepareData.prepareComboBox(
-            databaseOperation4, self.shotAgeGroupCB, 0, 0)
-        
+                databaseOperation4, self.shotAgeGroupCB, 0, 0)
+
         # Read data from table sukupuoli and populate the combo box
         databaseOperation5 = pgModule.DatabaseOperation()
         databaseOperation5.getAllRowsFromTable(
@@ -210,21 +213,22 @@ class MultiPageMainWindow(QMainWindow):
                        databaseOperation5.errorMessage, databaseOperation5.detailedMessage)
         else:
             self.shotGenderText = prepareData.prepareComboBox(
-            databaseOperation5, self.shotGenderCB, 0, 0)
+                databaseOperation5, self.shotGenderCB, 0, 0)
 
         # Read data from table kasittely
         databaseOperation6 = pgModule.DatabaseOperation()
         databaseOperation6.getAllRowsFromTable(
             self.connectionArguments, 'public.kasittely')
-        
+
         if databaseOperation6.errorCode != 0:
             self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
                        databaseOperation6.errorMessage, databaseOperation6.detailedMessage)
         else:
             self.shotUsageIdList = prepareData.prepareComboBox(
-            databaseOperation6, self.shotUsageCB, 1, 0)
+                databaseOperation6, self.shotUsageCB, 1, 0)
 
     # TODO: Make populate share page method
+    # def populateSharePage(self):
 
     # TODO: Make populate license page method
 
@@ -259,26 +263,30 @@ class MultiPageMainWindow(QMainWindow):
             sqlClauseEnd = ");"
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
+        # Check for conversion errors
         except Exception as error:
             errorOccurred = True
-            self.alert('Virheellinen syöte', 'Tarkista antamasi tiedot', 'Tyyppivirhe', str(error))
-        
+            self.alert('Virheellinen syöte',
+                       'Tarkista antamasi tiedot', 'Tyyppivirhe', str(error))
+
         finally:
             if errorOccurred == False:
-                    
+
                 # create DatabaseOperation object to execute the SQL clause
                 databaseOperation = pgModule.DatabaseOperation()
-                databaseOperation.insertRowToTable(self.connectionArguments, sqlClause)
-        
-        if databaseOperation.errorCode != 0:
-            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
-                       databaseOperation.errorMessage, databaseOperation.detailedMessage)
-        else:
-            # Update the page to show new data and clear previous data from elements
-            self.populateKillPage()
-            self.shotLocationLE.clear()
-            self.shotWeightLE.clear()
-            self.shotAddInfoTE.clear()
+                databaseOperation.insertRowToTable(
+                    self.connectionArguments, sqlClause)
+
+                if databaseOperation.errorCode != 0:
+                    self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                            databaseOperation.errorMessage, databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data and clear previous data from elements
+                    self.populateKillPage()
+                    self.shotLocationLE.clear()
+                    self.shotWeightLE.clear()
+                    self.shotAddInfoTE.clear()
+
 
 # APPLICATION CREATION AND STARTING
 # ----------------------------------
