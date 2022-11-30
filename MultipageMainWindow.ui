@@ -17,14 +17,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>10</y>
       <width>711</width>
       <height>541</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="summaryPage">
      <attribute name="title">
@@ -540,7 +540,7 @@
        </rect>
       </property>
       <property name="title">
-       <string>Jakoehdotukset</string>
+       <string>Jaot</string>
       </property>
      </widget>
     </widget>
@@ -1077,6 +1077,12 @@
   <action name="actionAppInfo">
    <property name="text">
     <string>Sovelluksen tiedot...</string>
+   </property>
+   <property name="toolTip">
+    <string>Sovelluksen tekijät ja lisätiedot</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

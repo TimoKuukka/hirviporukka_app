@@ -223,14 +223,42 @@ class MultiPageMainWindow(QMainWindow):
             self.shotUsageIdList = prepareData.prepareComboBox(
                 databaseOperation6, self.shotUsageCB, 1, 0)
 
-    # TODO: Make populate share page method
-    # def populateSharePage(self):
+    # TODO: FIXME: Make populate share page method
+    def populateSharePage(self):
+        # Set current date
+        self.shareDE.setDate(self.currentDate)
+
+        # Read data from view ruhonosa
+        databaseOperation1 = pgModule.DatabaseOperation()
+        databaseOperation1.getAllRowsFromTable(
+            self.connectionArguments, 'public.ruhonosa')
+
+        # Check if error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation1.errorMessage, databaseOperation1.detailedMessage)
+        else:
+            self.sharePortionText = prepareData.prepareComboBox(
+                databaseOperation1, self.sharePortionCB, 0, 0)
+
+        
+
+
+
+
+
+
+
+
+
+    
 
     # TODO: Make populate license page method
 
     def populateAllPages(self):
         self.populateSummaryPage()
         self.populateKillPage()
+        self.populateSharePage()
 
     def saveShot(self):
         errorOccurred = False
