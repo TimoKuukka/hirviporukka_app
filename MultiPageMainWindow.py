@@ -114,6 +114,9 @@ class MultiPageMainWindow(QMainWindow):
         alertDialog.setStandardButtons(QMessageBox.Ok)
         alertDialog.exec_()  # Open the message box
 
+
+# ----------------------------------------------------------------------------------
+
     # A method to populate summaryPage's table widgets
 
     def populateSummaryPage(self):
@@ -144,6 +147,8 @@ class MultiPageMainWindow(QMainWindow):
         else:
             prepareData.prepareTable(
                 databaseOperation2, self.summaryGroupSummaryTW)
+
+# ----------------------------------------------------------------------------------
 
     def populateKillPage(self):
         # Set default date to current date
@@ -223,7 +228,9 @@ class MultiPageMainWindow(QMainWindow):
             self.shotUsageIdList = prepareData.prepareComboBox(
                 databaseOperation6, self.shotUsageCB, 1, 0)
 
-    # TODO: FIXME: Make populate share page method
+# ----------------------------------------------------------------------------------
+
+    #  FIXME: Make populate share page method
     def populateSharePage(self):
         # Set current date
         self.shareDE.setDate(self.currentDate)
@@ -241,6 +248,21 @@ class MultiPageMainWindow(QMainWindow):
             self.sharePortionText = prepareData.prepareComboBox(
                 databaseOperation1, self.sharePortionCB, 0, 0)
 
+        # Read data from view jakoryhma
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+            self.connectionArguments, 'public.jakoryhma')
+
+        # Check if error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation2.errorMessage, databaseOperation2.detailedMessage)
+        else:
+            self.groupText = prepareData.prepareComboBox(
+                databaseOperation2, self.shareGroupCB, 0, 0)
+
+        
+
         
 
 
@@ -251,9 +273,20 @@ class MultiPageMainWindow(QMainWindow):
 
 
 
-    
+# ----------------------------------------------------------------------------------
 
     # TODO: Make populate license page method
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------
 
     def populateAllPages(self):
         self.populateSummaryPage()
@@ -311,6 +344,15 @@ class MultiPageMainWindow(QMainWindow):
                     self.shotWeightLE.clear()
                     self.shotAddInfoTE.clear()
 
+# ----------------------------------------------------------------------------------
+
+# TODO: def sharesavepushbutton
+
+
+
+
+# --------------------------------DIALOG--------------------------------------------
+
     # Needed to open dialog window
     def openinfo(self):
         dialogMakersWindow = DialogMakersWindow()
@@ -337,7 +379,7 @@ class DialogMakersWindow(QDialog):
 
 
 # APPLICATION CREATION AND STARTING
-# ----------------------------------
+# ----------------------------------------------------------------------------------
 
 
 # Check if app will be created and started directly from this file
