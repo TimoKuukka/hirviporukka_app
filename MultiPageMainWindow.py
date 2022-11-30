@@ -241,7 +241,18 @@ class MultiPageMainWindow(QMainWindow):
             self.sharePortionText = prepareData.prepareComboBox(
                 databaseOperation1, self.sharePortionCB, 0, 0)
 
+        # Read data from view jakoryhma
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+            self.connectionArguments, 'public.jakoryhma')
         
+        # Check if error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation2.errorMessage, databaseOperation2.detailedMessage)
+        else:
+            self.shareGroupText = prepareData.prepareComboBox(
+                databaseOperation2, self.shareGroupCB, 0, 0)
 
 
 
