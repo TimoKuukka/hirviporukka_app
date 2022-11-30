@@ -1,11 +1,11 @@
-from PyQt5.QtWidgets import *
+
 # A class for a dialog to save database settings
-class makersDialog(QDialog):
+class DialogMakersWindow(QDialog):
     """Creates a dialog to open software developer and software info"""
 
     # Constructor
     def __init__(self):
-        makersDialog().__init__()
+        super().__init__()
 
         loadUi("DialogMakersWindow.ui", self)
 

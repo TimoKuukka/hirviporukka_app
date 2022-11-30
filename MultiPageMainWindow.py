@@ -11,15 +11,13 @@ from PyQt5.QtCore import *  # FIXME: Everything,  change to individual component
 from datetime import date
 import pgModule
 import prepareData
-import DialogMakersWindow
-import dialogs
+
 
 # CLASS DEFINITIONS FOR THE APP
 # -----------------------------
 
 
 class MultiPageMainWindow(QMainWindow):
-
 
     # Constructor, a method for creating objects from this class
     def __init__(self):
@@ -41,6 +39,7 @@ class MultiPageMainWindow(QMainWindow):
         # Set it as the status bar for the main window
         self.setStatusBar(self.statusBar)
         self.statusBar.show()  # Make it visible
+        self.actionAppInfo.triggered.connect(self.openinfo)
 
         # Set current date when the app starts
         self.currentDate = date.today()
@@ -90,11 +89,8 @@ class MultiPageMainWindow(QMainWindow):
         # Signals other than emitted by UI elements
         self.populateAllPages()
 
-       
-
-    # SLOTS
-
     # Create an alert dialog for critical failures, eg no database connection established
+
     def alert(self, windowTitle, alertMsg, additionalMsg, details):
         """Creates a message box for critical errors
 
@@ -279,13 +275,37 @@ class MultiPageMainWindow(QMainWindow):
 
                 if databaseOperation.errorCode != 0:
                     self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
-                            databaseOperation.errorMessage, databaseOperation.detailedMessage)
+                               databaseOperation.errorMessage, databaseOperation.detailedMessage)
                 else:
                     # Update the page to show new data and clear previous data from elements
                     self.populateKillPage()
                     self.shotLocationLE.clear()
                     self.shotWeightLE.clear()
                     self.shotAddInfoTE.clear()
+
+    # Needed to open dialog window
+    def openinfo(self):
+        dialogMakersWindow = DialogMakersWindow()
+        dialogMakersWindow.exec()
+
+# A class for a dialog to show makers and app info
+class DialogMakersWindow(QDialog):
+    """Creates a dialog to open software developer and software info"""
+
+    # Constructor
+    def __init__(self):
+        super().__init__()
+
+        loadUi("DialogMakersWindow.ui", self)
+
+        self.setWindowTitle('Sovelluksen tiedot')
+
+        # Create an object to use setting methods
+        self.databaseOperation = pgModule.DatabaseOperation()  # Needed in slots -> self
+
+    # Peru button closes the dialog
+    def closeDialog(self):
+        self.close()
 
 
 # APPLICATION CREATION AND STARTING
