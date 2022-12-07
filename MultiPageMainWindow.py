@@ -269,6 +269,53 @@ class MultiPageMainWindow(QMainWindow):
 # ----------------------------------------------------------------------------------
 
     # TODO: Make populate license page method
+    def populateLicensePage(self):
+        
+        # Read data from table elain and populate the combo box
+        databaseOperation1 = pgModule.DatabaseOperation()
+        databaseOperation1.getAllRowsFromTable(
+            self.connectionArguments, 'public.elain')
+
+        # Check if error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation1.errorMessage, databaseOperation1.detailedMessage)
+        else:
+            self.shotAnimalText = prepareData.prepareComboBox(
+                databaseOperation1, self.licenseAnimalCB, 0, 0)
+
+
+        # Read data from table aikuinenvasa and populate the combo box
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+            self.connectionArguments, 'public.aikuinenvasa')
+
+        # Check if error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation2.errorMessage, databaseOperation2.detailedMessage)
+        else:
+            self.shotAgeGroupText = prepareData.prepareComboBox(
+                databaseOperation2, self.licenseAgeGroupCB, 0, 0)
+
+        
+        # Read data from table sukupuoli and populate the combo box
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+            self.connectionArguments, 'public.sukupuoli')
+        
+         # Check if error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation3.errorMessage, databaseOperation3.detailedMessage)
+        else:
+            self.shotAgeGroupText = prepareData.prepareComboBox(
+                databaseOperation3, self.licenseGenderCB, 0, 0)
+
+
+
+
+        
 
 
 
@@ -285,6 +332,7 @@ class MultiPageMainWindow(QMainWindow):
         self.populateSummaryPage()
         self.populateKillPage()
         self.populateSharePage()
+        self.populateLicensePage()
 
     def saveShot(self):
         errorOccurred = False
