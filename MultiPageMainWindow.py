@@ -6,11 +6,13 @@
 
 import sys  # Needed for starting the application
 from PyQt5.QtWidgets import *  # All widgets
+from PyQt5 import QtWebEngineWidgets # For showing html content
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import *  # FIXME: Everything,  change to individual components
 from datetime import date
 import pgModule
 import prepareData
+import figures
 
 
 # CLASS DEFINITIONS FOR THE APP
@@ -39,7 +41,6 @@ class MultiPageMainWindow(QMainWindow):
         # Set it as the status bar for the main window
         self.setStatusBar(self.statusBar)
         self.statusBar.show()  # Make it visible
-        self.actionAppInfo.triggered.connect(self.openinfo)
 
         # Set current date when the app starts
         self.currentDate = date.today()
@@ -72,6 +73,7 @@ class MultiPageMainWindow(QMainWindow):
         self.shareAmountLE = self.amountLineEdit
         self.shareGroupCB = self.groupComboBox
         self.shareSavePushBtn = self.shareSavePushButton
+        self.shareSavePushBtn.clicked.connect(self.saveShare) # Signal added 7.12.2022
 
         # License page (Luvat)
         self.licenseYearLE = self.licenseYearLineEdit
@@ -263,15 +265,6 @@ class MultiPageMainWindow(QMainWindow):
 
         
 
-        
-
-
-
-
-
-
-
-
 
 # ----------------------------------------------------------------------------------
 
@@ -347,6 +340,46 @@ class MultiPageMainWindow(QMainWindow):
 # ----------------------------------------------------------------------------------
 
 # TODO: def sharesavepushbutton
+
+    def saveShare(self):
+        errorOccurred = False
+        try:
+            shareDay = self.shareDE.date().toPyDate()  # Python date is in ISO format
+            animalpart = self.sharePortionCB.currentText()  # Selected value of the combo box
+            # Convert line edit value into float (real in the DB)
+            weight = float(self.shareAmountLE.text())
+            shareGroup = self.shareGroupCB.currentIndex()  # Row index of the selected row
+
+            # Insert data into kaato table
+            # Create a SQL clause to insert element values to the DB
+            sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
+            (jakopaiva, ruhopaino, 
+            kasittelyid, jakoryhma) VALUES("""
+            sqlClauseValues = f"'{shareDay}', {weight}, {animalpart}, {shareGroup}"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+
+        # Check for conversion errors
+        except Exception as error:
+            errorOccurred = True
+            self.alert('Virheellinen syöte',
+                       'Tarkista antamasi tiedot', 'Tyyppivirhe', str(error))
+
+        finally:
+            if errorOccurred == False:
+
+                # create DatabaseOperation object to execute the SQL clause
+                databaseOperation = pgModule.DatabaseOperation()
+                databaseOperation.insertRowToTable(
+                    self.connectionArguments, sqlClause)
+
+                if databaseOperation.errorCode != 0:
+                    self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                               databaseOperation.errorMessage, databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data and clear previous data from elements
+                    self.populateKillPage()
+                    self.shareAmountLE.clear()
 
 
 
