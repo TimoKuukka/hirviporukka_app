@@ -82,6 +82,7 @@ class MultiPageMainWindow(QMainWindow):
         self.licenseGenderCB = self.licenseGenderComboBox
         self.licenseAmountLE = self.licenseAmountLineEdit
         self.licenseSavePushBtn = self.licenseSavePushButton
+        self.licenseSavePushBtn.clicked.connect(self.saveLicense) # Signal added 10.12.2022
         self.licenseSummaryTW = self.licenseSummaryTableWidget
 
         # Signal when a page is opened
@@ -237,7 +238,7 @@ class MultiPageMainWindow(QMainWindow):
         # Set current date
         self.shareDE.setDate(self.currentDate)
 
-        # Read data from view ruhonosa
+        # Read data from table ruhonosa
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
             self.connectionArguments, 'public.ruhonosa')
