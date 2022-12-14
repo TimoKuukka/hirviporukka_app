@@ -6,11 +6,13 @@
 
 import sys  # Needed for starting the application
 from PyQt5.QtWidgets import *  # All widgets
+from PyQt5 import QtWebEngineWidgets # For showing html content
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import *  # FIXME: Everything,  change to individual components
 from datetime import date
 import pgModule
 import prepareData
+import figures
 
 
 # CLASS DEFINITIONS FOR THE APP
@@ -39,7 +41,6 @@ class MultiPageMainWindow(QMainWindow):
         # Set it as the status bar for the main window
         self.setStatusBar(self.statusBar)
         self.statusBar.show()  # Make it visible
-        self.actionAppInfo.triggered.connect(self.openinfo)
 
         # Set current date when the app starts
         self.currentDate = date.today()
@@ -72,6 +73,7 @@ class MultiPageMainWindow(QMainWindow):
         self.shareAmountLE = self.amountLineEdit
         self.shareGroupCB = self.groupComboBox
         self.shareSavePushBtn = self.shareSavePushButton
+        self.shareSavePushBtn.clicked.connect(self.saveShare) # Signal added 7.12.2022
 
         # License page (Luvat)
         self.licenseYearLE = self.licenseYearLineEdit
@@ -80,6 +82,7 @@ class MultiPageMainWindow(QMainWindow):
         self.licenseGenderCB = self.licenseGenderComboBox
         self.licenseAmountLE = self.licenseAmountLineEdit
         self.licenseSavePushBtn = self.licenseSavePushButton
+        self.licenseSavePushBtn.clicked.connect(self.saveLicense) # Signal added 10.12.2022
         self.licenseSummaryTW = self.licenseSummaryTableWidget
 
         # Signal when a page is opened
@@ -114,6 +117,9 @@ class MultiPageMainWindow(QMainWindow):
         alertDialog.setStandardButtons(QMessageBox.Ok)
         alertDialog.exec_()  # Open the message box
 
+
+# ----------------------------------------------------------------------------------
+
     # A method to populate summaryPage's table widgets
 
     def populateSummaryPage(self):
@@ -144,6 +150,8 @@ class MultiPageMainWindow(QMainWindow):
         else:
             prepareData.prepareTable(
                 databaseOperation2, self.summaryGroupSummaryTW)
+
+# ----------------------------------------------------------------------------------
 
     def populateKillPage(self):
         # Set default date to current date
@@ -223,12 +231,14 @@ class MultiPageMainWindow(QMainWindow):
             self.shotUsageIdList = prepareData.prepareComboBox(
                 databaseOperation6, self.shotUsageCB, 1, 0)
 
-    # TODO: FIXME: Make populate share page method
+# ----------------------------------------------------------------------------------
+
+    #  FIXME: Make populate share page method
     def populateSharePage(self):
         # Set current date
         self.shareDE.setDate(self.currentDate)
 
-        # Read data from view ruhonosa
+        # Read data from table ruhonosa
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
             self.connectionArguments, 'public.ruhonosa')
@@ -245,6 +255,15 @@ class MultiPageMainWindow(QMainWindow):
         databaseOperation2 = pgModule.DatabaseOperation()
         databaseOperation2.getAllRowsFromTable(
             self.connectionArguments, 'public.jakoryhma')
+
+        # Check if error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation2.errorMessage, databaseOperation2.detailedMessage)
+        else:
+            self.groupText = prepareData.prepareComboBox(
+                databaseOperation2, self.shareGroupCB, 0, 0)
+
         
         # Check if error has occurred
         if databaseOperation2.errorCode != 0:
@@ -255,21 +274,73 @@ class MultiPageMainWindow(QMainWindow):
                 databaseOperation2, self.shareGroupCB, 0, 0)
 
 
-
-
-
-
-
-
-
-    
+# ----------------------------------------------------------------------------------
 
     # TODO: Make populate license page method
+    def populateLicensePage(self):
+        
+        # Read data from table elain and populate the combo box
+        databaseOperation1 = pgModule.DatabaseOperation()
+        databaseOperation1.getAllRowsFromTable(
+            self.connectionArguments, 'public.elain')
+
+        # Check if error has occurred
+        if databaseOperation1.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation1.errorMessage, databaseOperation1.detailedMessage)
+        else:
+            self.shotAnimalText = prepareData.prepareComboBox(
+                databaseOperation1, self.licenseAnimalCB, 0, 0)
+
+
+        # Read data from table aikuinenvasa and populate the combo box
+        databaseOperation2 = pgModule.DatabaseOperation()
+        databaseOperation2.getAllRowsFromTable(
+            self.connectionArguments, 'public.aikuinenvasa')
+
+        # Check if error has occurred
+        if databaseOperation2.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation2.errorMessage, databaseOperation2.detailedMessage)
+        else:
+            self.shotAgeGroupText = prepareData.prepareComboBox(
+                databaseOperation2, self.licenseAgeGroupCB, 0, 0)
+
+        
+        # Read data from table sukupuoli and populate the combo box
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+            self.connectionArguments, 'public.sukupuoli')
+        
+         # Check if error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation3.errorMessage, databaseOperation3.detailedMessage)
+        else:
+            self.shotAgeGroupText = prepareData.prepareComboBox(
+                databaseOperation3, self.licenseGenderCB, 0, 0)
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+# ----------------------------------------------------------------------------------
 
     def populateAllPages(self):
         self.populateSummaryPage()
         self.populateKillPage()
         self.populateSharePage()
+        self.populateLicensePage()
 
     def saveShot(self):
         errorOccurred = False
@@ -322,6 +393,55 @@ class MultiPageMainWindow(QMainWindow):
                     self.shotWeightLE.clear()
                     self.shotAddInfoTE.clear()
 
+# ----------------------------------------------------------------------------------
+
+# TODO: def sharesavepushbutton
+
+    def saveShare(self):
+        errorOccurred = False
+        try:
+            shareDay = self.shareDE.date().toPyDate()  # Python date is in ISO format
+            animalpart = self.sharePortionCB.currentText()  # Selected value of the combo box
+            # Convert line edit value into float (real in the DB)
+            weight = float(self.shareAmountLE.text())
+            shareGroup = self.shareGroupCB.currentIndex()  # Row index of the selected row
+
+            # Insert data into kaato table
+            # Create a SQL clause to insert element values to the DB
+            sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
+            (jakopaiva, ruhopaino, 
+            kasittelyid, jakoryhma) VALUES("""
+            sqlClauseValues = f"'{shareDay}', {weight}, {animalpart}, {shareGroup}"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+
+        # Check for conversion errors
+        except Exception as error:
+            errorOccurred = True
+            self.alert('Virheellinen syöte',
+                       'Tarkista antamasi tiedot', 'Tyyppivirhe', str(error))
+
+        finally:
+            if errorOccurred == False:
+
+                # create DatabaseOperation object to execute the SQL clause
+                databaseOperation = pgModule.DatabaseOperation()
+                databaseOperation.insertRowToTable(
+                    self.connectionArguments, sqlClause)
+
+                if databaseOperation.errorCode != 0:
+                    self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                               databaseOperation.errorMessage, databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data and clear previous data from elements
+                    self.populateKillPage()
+                    self.shareAmountLE.clear()
+
+
+
+
+# --------------------------------DIALOG--------------------------------------------
+
     # Needed to open dialog window
     def openinfo(self):
         dialogMakersWindow = DialogMakersWindow()
@@ -348,7 +468,7 @@ class DialogMakersWindow(QDialog):
 
 
 # APPLICATION CREATION AND STARTING
-# ----------------------------------
+# ----------------------------------------------------------------------------------
 
 
 # Check if app will be created and started directly from this file
