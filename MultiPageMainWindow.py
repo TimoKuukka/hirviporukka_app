@@ -67,6 +67,7 @@ class MultiPageMainWindow(QMainWindow):
 
         # Share page (Lihanjako)
         self.shareKillsTW = self.shareKillsTableWidget
+        self.shareTW = self.shareTableWidget
         self.shareDE = self.shareDateEdit
         self.sharePortionCB = self.portionComboBox
         self.shareAmountLE = self.amountLineEdit
@@ -403,18 +404,20 @@ class MultiPageMainWindow(QMainWindow):
     def saveShare(self):
         errorOccurred = False
         try:
+            shareKillChosenRowIx = self.shareKillsTW.currentRow()
+            shareKill = int(self.shareKillsTW.itemAt(shareKillChosenRowIx, 0).text())
             shareDay = self.shareDE.date().toPyDate()  # Python date is in ISO format
             animalpart = self.sharePortionCB.currentText()  # Selected value of the combo box
             # Convert line edit value into float (real in the DB)
             weight = float(self.shareAmountLE.text())
+            shareGroupChosenItemIx = self.shareGroupCB.currentIndex()
             shareGroup = self.shareGroupCB.currentIndex()  # Row index of the selected row
 
             # Insert data into kaato table
             # Create a SQL clause to insert element values to the DB
             sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
-            (jakopaiva, ruhopaino, 
-            kasittelyid, jakoryhma) VALUES("""
-            sqlClauseValues = f"'{shareDay}', {weight}, '{animalpart}', {shareGroup}"
+            (paiva, ryhma_id, kaatoId, osnimitys, maara,) VALUES(""" # FIXME: tee ryhmä oikeaan järjestykseen
+            sqlClauseValues = f"'{shareDay}', {weight}, '{animalpart}', {shareGroup}, {shareKill}"
             sqlClauseEnd = ");"
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 

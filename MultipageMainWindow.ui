@@ -530,16 +530,26 @@
        <string>Tallenna</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="shareSuggestGroupBox">
+     <widget class="QTableWidget" name="shareTableWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>310</y>
-        <width>571</width>
-        <height>201</height>
+        <x>15</x>
+        <y>321</y>
+        <width>561</width>
+        <height>181</height>
        </rect>
       </property>
-      <property name="title">
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
        <string>Jaot</string>
       </property>
      </widget>
