@@ -247,7 +247,7 @@ class MultiPageMainWindow(QMainWindow):
             self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
                        databaseOperation3.errorMessage, databaseOperation3.detailedMessage)
         else:
-            prepareData.prepareTable(databaseOperation3, self.shareKillsTW)
+            self.shareKillIdList = prepareData.prepareTable(databaseOperation3, self.shareKillsTW)
 
         # Read data from table ruhonosa
         databaseOperation1 = pgModule.DatabaseOperation()
