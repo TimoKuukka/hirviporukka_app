@@ -12,7 +12,6 @@ from PyQt5.QtCore import *  # FIXME: Everything,  change to individual component
 from datetime import date
 import pgModule
 import prepareData
-import figures
 
 
 # CLASS DEFINITIONS FOR THE APP
@@ -238,6 +237,18 @@ class MultiPageMainWindow(QMainWindow):
         # Set current date
         self.shareDE.setDate(self.currentDate)
 
+        # Read data from view kaatoluettelo
+        databaseOperation3 = pgModule.DatabaseOperation()
+        databaseOperation3.getAllRowsFromTable(
+            self.connectionArguments, 'public.kaatoluettelo')
+
+        # Check if error has occurred
+        if databaseOperation3.errorCode != 0:
+            self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                       databaseOperation3.errorMessage, databaseOperation3.detailedMessage)
+        else:
+            prepareData.prepareTable(databaseOperation3, self.shareKillsTW)
+
         # Read data from table ruhonosa
         databaseOperation1 = pgModule.DatabaseOperation()
         databaseOperation1.getAllRowsFromTable(
@@ -323,14 +334,6 @@ class MultiPageMainWindow(QMainWindow):
 
 
 
-        
-
-
-
-
-
-
-
 
 
 
@@ -411,7 +414,7 @@ class MultiPageMainWindow(QMainWindow):
             sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
             (jakopaiva, ruhopaino, 
             kasittelyid, jakoryhma) VALUES("""
-            sqlClauseValues = f"'{shareDay}', {weight}, {animalpart}, {shareGroup}"
+            sqlClauseValues = f"'{shareDay}', {weight}, '{animalpart}', {shareGroup}"
             sqlClauseEnd = ");"
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
@@ -436,6 +439,56 @@ class MultiPageMainWindow(QMainWindow):
                     # Update the page to show new data and clear previous data from elements
                     self.populateKillPage()
                     self.shareAmountLE.clear()
+
+# TODO: SaveLicensePushButton
+
+    def saveLicense(self):
+        errorOccurred = False
+        try:
+            #shotByChosenItemIx = self.shotByCB.currentIndex()
+            licenseYear = float(self.licenseYearLE.text())
+            licenseAnimal = self.licenseAnimalCB.currentIndex()
+            licenseAgeGroup = self.licenseAgeGroupCB.currentIndex()
+            licenseGender = self.licenseGenderCB.currentIndex()
+            licenseAmount = float(self.licenseAmountLE.text())
+
+            # Insert data into license summary table widget
+            # Create a SQL clause to insert element values
+            sqlClauseBeginning = """INSERT INTO public.lupa
+            (lupavuosi, elaimen_nimi, 
+            ikaluokka, maara, ikaluokka) VALUES("""
+            sqlClauseValues = f"'{licenseYear}', {licenseAmount}, '{licenseAnimal}', '{licenseAgeGroup}', '{licenseGender}'"
+            sqlClauseEnd = ");"
+            sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
+            
+            # Check for conversion errors
+        except Exception as error:
+            errorOccurred = True
+            self.alert('Virheellinen syöte',
+                       'Tarkista antamasi tiedot', 'Tyyppivirhe', str(error))
+
+        finally:
+            if errorOccurred == False:
+
+                # create DatabaseOperation object to execute the SQL clause
+                databaseOperation = pgModule.DatabaseOperation()
+                databaseOperation.insertRowToTable(
+                    self.connectionArguments, sqlClause)
+
+                if databaseOperation.errorCode != 0:
+                    self.alert('Vakava virhe', 'Tietokantaoperaatio epäonnistui',
+                               databaseOperation.errorMessage, databaseOperation.detailedMessage)
+                else:
+                    # Update the page to show new data and clear previous data from elements
+                    self.populateSharePage()
+                    self.licenseAmountLE.clear()
+                    self.licenseYearLE.clear()
+
+
+
+# ----------------------------------------------------------------------------------
+
+
 
 
 
