@@ -1,3 +1,4 @@
+import pgModule
 
 # A class for a dialog to save database settings
 class DialogMakersWindow(QDialog):
