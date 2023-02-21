@@ -40,6 +40,7 @@ class MultiPageMainWindow(QMainWindow):
         # Set it as the status bar for the main window
         self.setStatusBar(self.statusBar)
         self.statusBar.show()  # Make it visible
+        self.setWindowTitle('Jahtirekisteri') # Give name
 
         # Set current date when the app starts
         self.currentDate = date.today()
@@ -399,7 +400,7 @@ class MultiPageMainWindow(QMainWindow):
 
 # ----------------------------------------------------------------------------------
 
-# TODO: def sharesavepushbutton
+# TODO: fix sharesavepushbutton
 
     def saveShare(self):
         errorOccurred = False
@@ -415,9 +416,13 @@ class MultiPageMainWindow(QMainWindow):
 
             # Insert data into kaato table
             # Create a SQL clause to insert element values to the DB
-            sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
-            (paiva, ryhma_id, kaatoId, osnimitys, maara,) VALUES(""" # FIXME: tee ryhmä oikeaan järjestykseen
-            sqlClauseValues = f"'{shareDay}', {weight}, '{animalpart}', {shareGroup}, {shareKill}"
+            
+            # FIXME: Savesharebutton ei toimi
+            sqlClauseBeginning = "INSERT INTO public.jakotapahtuma(paiva, ryhma_id, osnimitys, maara, kaato_id) VALUES("
+            # sqlClauseBeginning = """INSERT INTO public.jakotapahtuma
+            # (paiva, ryhma_id, kaatoId, osnimitys, maara) VALUES(""" # FIXME: tee ryhmä oikeaan järjestykseen
+            sqlClauseValues = f"'{shareDay}', {shareGroup}, '{animalpart}', {weight}, {shareKill}"
+            # sqlClauseValues = f"'{shareDay}', {weight}, '{animalpart}', {shareGroup}, {shareKill}"
             sqlClauseEnd = ");"
             sqlClause = sqlClauseBeginning + sqlClauseValues + sqlClauseEnd
 
